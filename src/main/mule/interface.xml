@@ -105,6 +105,17 @@ output application/json
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d0a6e49e-f7d6-4b59-a4be-0770f86cc737" type="HTTP:NOT_FOUND">
+				<ee:transform doc:name="Transform Message" doc:id="ce568c07-b6d5-4546-8f70-f2370f7e56a4" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
 		</error-handler>
 	</flow>
 </mule>

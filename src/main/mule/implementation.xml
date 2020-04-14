@@ -75,6 +75,11 @@ http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/
 			</ee:message>
 		</ee:transform>
 		<flow-ref doc:name="log-end-sub-flow" doc:id="73c02546-3446-4b9c-b2d9-f8faa3acc67d" name="log-end-sub-flow"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="53db4e95-45ed-4828-960c-73bd600d33e6">
+				<flow-ref doc:name="error-handler" doc:id="24607a65-cbaf-45e9-8d89-9975b857a717" name="error-handler"/>
+			</on-error-propagate>
+		</error-handler>
     </flow>
     
     <!-- TODO: Convert Limit/Offset to Page -->
