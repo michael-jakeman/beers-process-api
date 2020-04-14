@@ -133,8 +133,7 @@ Ensure that you have correctly configured your plugin config including:
     </credentials>
     <exchangeAsset>
         <groupId></groupId>
-        <assetId></assetId>q
-
+        <assetId></assetId>
         <version></version>
         <productVersion></productVersion>
     </exchangeAsset>
