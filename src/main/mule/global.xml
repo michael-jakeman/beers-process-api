@@ -11,7 +11,7 @@ http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule
         <http:listener-connection host="0.0.0.0" port="${https.internal.port}" tlsContext="tls-context" protocol="HTTPS"/>
     </http:listener-config>
     
-    <apikit:config name="main-config" api="main.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="main-config" api="api/main.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     
     <http:request-config name="http-brewery-requester-config" doc:name="HTTP Request configuration" doc:id="54220095-8986-4bc8-9237-1529528b0b4c" basePath="${request.http.brewery.base}">
         <http:request-connection protocol="${request.http.brewery.protocol}" host="${request.http.brewery.host}" port="${request.http.brewery.port}" >

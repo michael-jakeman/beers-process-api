@@ -1,5 +1,6 @@
 %dw 2.0
 import java!com::mike::ResolveUri
+import * from dw::core::URL
 fun remove(name) =
  if(isEmpty(vars.filter))
  		false 
@@ -19,7 +20,7 @@ output application/json skipNullOn="everywhere"
  * As a work around I've created filterOutput function until filterObject can filter based off anyMatch.
  */
 write({
-	id: vars.uri.full,
+	id: encodeURI(vars.uri.full),
 	totalNumberOfItems: payload.totalResults,
 	numberOfItems: if (payload.totalResults > 0)sizeOf(payload.data) else 0,
 	items: (payload.data default []) map (beer) -> {
