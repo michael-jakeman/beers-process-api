@@ -36,6 +36,18 @@ Finally, ensure you read the section on Gateway Offloading to ensure your Postma
 
 ## Running Unit Tests
 
+To run MUnit tests they can either be run from Anypoint Studio or from the terminal.
+
+Simply right click and run from studio or run 'mvn test' in terminal.
+
+## Shared RAML Components
+
+The API includes both a common library and common data types.
+
+The common library helps users implement standard functionality such as ordering, pagination and filtering
+
+Common data types ensure that data within the domain is standardised.
+
 # Design Patterns
 
 ## Read Through Cache
@@ -43,10 +55,6 @@ Finally, ensure you read the section on Gateway Offloading to ensure your Postma
 A basic read-through cache is implemented on the GET:/beers endpoint caching against the URI of the request.
 
 The cache is configured to last 15 minutes.
-
-```
-TODO: Find out how to expose access the TTL on the cache object and set the Expires header so that clients can invalidate their cache if they're caching responses.
-```
 
 ![image info](./documentation/images/read-through.png)
 	
@@ -99,7 +107,7 @@ The MuleSoft dedicated load balancer doesnt perform host validation on the certi
 
 ## REST
 
-TODO: Write about REST
+The application implements RESTful API best practices
 
 ## API Manager Plugin
 
@@ -123,7 +131,8 @@ Ensure that you have correctly configured your plugin config including:
     </credentials>
     <exchangeAsset>
         <groupId></groupId>
-        <assetId></assetId>
+        <assetId></assetId>q
+
         <version></version>
         <productVersion></productVersion>
     </exchangeAsset>
@@ -139,3 +148,9 @@ To run the plugin simply run (ensure that you have filled out the required xml e
 ```
 mvn com.mike.codes:api-manager-plugin:1.0.0-SNAPSHOT:apply-policies
 ```
+
+## Cloudhub notifications
+
+If parts of the API fail then alerts are triggered informing DevOps teams that there's been an error in the API.
+
+For this to work correctly you'll need to configure alerts in Runtime Manager and ensure that you've set cloudhub.username, cloudhub.password and cloudhub.environment correctly. Usually this would be set by Jenkins.
