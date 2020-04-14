@@ -18,7 +18,6 @@ http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/
 				<jms:publish doc:name="Publish message to ActiveMQ Beers Topic" doc:id="ad30d330-e927-4956-ae59-7c3f5e52e1ab" destinationType="TOPIC" config-ref="beers-jms-config" destination="${jms.beers.topics.beers}"/>
 			</route>
 			<route>
-				<!-- TODO: Enrich the payload -->
 				<ee:transform doc:name="Serialize the payload before caching" doc:id="00c3a612-8deb-4ea3-9653-ea2475dd4696">
 					<ee:message>
 						<ee:set-payload resource="dw/beers/serialize-beer-payload.dwl" />
@@ -59,13 +58,12 @@ http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/
 				</http:request>
 			</route>
 		</scatter-gather>
-		<!-- TODO: Add the negative scenario into the dataweave for if the beer doesnt exist in the DB return a 404 -->
-			<ee:transform doc:name="Transform into Domain Model" doc:id="9fd9af88-00de-49c4-a4c6-a64d47c17dae">
-			<ee:message>
-							<ee:set-payload resource="dw/beers-trainsform-into-domain-beer-model.dwl" />
-			</ee:message>
+		<ee:transform doc:name="Transform into Domain Model" doc:id="9fd9af88-00de-49c4-a4c6-a64d47c17dae">
+		<ee:message>
+			<ee:set-payload resource="dw/beers-trainsform-into-domain-beer-model.dwl" />
+		</ee:message>
 		</ee:transform>
-					<flow-ref doc:name="delete-all-flow-variables-sub-flow" doc:id="8f28b1d8-05d5-4730-8a8f-b60975fe0231" name="delete-all-flow-variables-sub-flow" />
+			<flow-ref doc:name="delete-all-flow-variables-sub-flow" doc:id="8f28b1d8-05d5-4730-8a8f-b60975fe0231" name="delete-all-flow-variables-sub-flow" />
 		</ee:cache>
 			</otherwise>
 		</choice>

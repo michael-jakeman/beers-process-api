@@ -10,21 +10,10 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<sub-flow name="error-handler" doc:id="71575cd3-38a0-4023-93f2-19710b71dd45" >
 		<ee:transform doc:name="Generate Error Responses" doc:id="f08af7c9-5be1-40da-823b-1f3887e7e368" >
 			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	message: error.errors[0].errorType.identifier
-}]]></ee:set-payload>
+				<ee:set-payload resource="dw/errors/generic-error-message.dwl" />
 			</ee:message>
 			<ee:variables >
-				<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
-output application/java
----
-error.errors[0].errorType.identifier match {
-	case "NOT_FOUND" -> 404
-	else -> 500
-}]]></ee:set-variable>
+				<ee:set-variable resource="dw/errors/generic-error-code.dwl" variableName="httpStatus" />
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>

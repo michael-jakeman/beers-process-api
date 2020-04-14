@@ -33,20 +33,13 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 			<http:request method="GET" doc:name="GET countries from Countries API" doc:id="bade603c-9d61-4860-8772-d2f67a934002" config-ref="http-countries-requester-config" path="${request.http.countries.url.countries}" />
 			<ee:transform doc:name="Transform into Hashmap and Serialize as String" doc:id="0bfac61b-2e51-4550-8919-7376f3541ea7">
 				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-import modules::common
-output application/json
----
-write(common::mapReduce(payload, "alpha2Code"), "application/json")]]></ee:set-payload>
+					<ee:set-payload resource="dw/countries/serialize-and-map-reduce-countries.dwl" />
 				</ee:message>
 			</ee:transform>
 		</ee:cache>
 		<ee:transform doc:name="Convert String to Java Object" doc:id="cb6b87aa-d7ba-4f56-9f51-52d445ee0fa6" >
 			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-read(payload, "application/json")]]></ee:set-payload>
+				<ee:set-payload resource="dw/countries/convert-to-java-obj.dwl" />
 			</ee:message>
 		</ee:transform>
 	</sub-flow>
