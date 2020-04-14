@@ -156,3 +156,16 @@ mvn com.mike.codes:api-manager-plugin:1.0.0-SNAPSHOT:apply-policies
 If parts of the API fail then alerts are triggered informing DevOps teams that there's been an error in the API.
 
 For this to work correctly you'll need to configure alerts in Runtime Manager and ensure that you've set cloudhub.username, cloudhub.password and cloudhub.environment correctly. Usually this would be set by Jenkins.
+
+
+# Future Improvements
+
+The following endpoints have not been implemented but are on the roadmap. It would be useful for breweries not to need to know what ID they want their beer to be created with, but as it's an asynchronous process they'll need to know how to access the beer for now.
+
+## POST:/beers
+
+In future we'll generate an ID in the POST section so we can return this to the client with 202 Accepted status code, then create use the same logic as the PUT flow
+
+## GET:/beers/{beerId}/reviews
+
+In future we'll integrate with social media and maintain a cache of reviews for each product.
