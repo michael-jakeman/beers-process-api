@@ -1,0 +1,20 @@
+{
+  "id": "http://localhost:8092/v1/beers",
+  "totalNumberOfItems": 1109,
+  "numberOfItems": 2,
+  "items": [
+    {
+      "id": "http://localhost:8092/v1/beers/c4f2KE",
+      "identifier": "c4f2KE",
+      "name": "'Murican Pilsner",
+      "abv": "5.5"
+    },
+    {
+      "id": "http://localhost:8092/v1/beers/zTTWa2",
+      "identifier": "zTTWa2",
+      "name": "11.5° PLATO",
+      "description": "The Plato scale is a measurement of the density of liquid. The number tells brewers how big or small a resulting beer will be—the larger the number the bigger the beer. We designed 11.5° Plato—a lower number on the beer scale—to give us just enough body to support a heavy heap of hops. The result is an easy-drinking session IPA which satisfies the thirst for hops, but urges you to have another round.",
+      "abv": "4.5"
+    }
+  ]
+}

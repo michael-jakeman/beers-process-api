@@ -1,0 +1,20 @@
+#%RAML 1.0 DataType
+displayName: Review
+description: 
+example: !include examples/review.json
+properties:
+  id:
+    displayName: ID
+    description: The URI of the resource
+    type: string
+    example: "https://mike.com/v1/reviews/1"
+  identifier:
+    displayName: Identifier
+    description: The identifier of the review
+    type: string
+    example: "1"
+  content:
+    displayName: Content
+    description: The contet of the review
+    type: string
+    example: "I really loved Mike's Beer!"

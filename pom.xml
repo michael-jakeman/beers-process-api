@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.mike</groupId>
+	<artifactId>process-api</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>mule-application</packaging>
+
+	<name>process-api</name>
+	
+	<parent>
+		<groupId>com.mike</groupId>
+		<artifactId>presentation-parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	
+	<build>
+        <plugins>
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-maven-plugin</artifactId>
+                <version>${mule.maven.plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <sharedLibraries>
+                        <sharedLibrary>
+                            <groupId>org.apache.activemq</groupId>
+                            <artifactId>activemq-client</artifactId>
+                        </sharedLibrary>
+                        <sharedLibrary>
+                            <groupId>org.apache.activemq</groupId>
+                            <artifactId>activemq-broker</artifactId>
+                        </sharedLibrary>
+                    </sharedLibraries>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mulesoft.munit.tools</groupId>
+                <artifactId>munit-maven-plugin</artifactId>
+                <version>${munit.version}</version>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                            <goal>coverage-report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <coverage>
+                        <runCoverage>true</runCoverage>
+                        <formats>
+                            <format>html</format>
+                        </formats>
+                        <ignoreFiles>
+                        	<!-- Omit the interface file as there's no functionality here, usually this would be inside a common components 
+                        	Having the interface in common components gives you a standardised way of listening to requests, setting correlationId values
+                        	and reduces the overhead of managing certificates as we can offload SSL at the DLB rather than at the application level. -->
+       		 				<ignoreFile>interface.xml</ignoreFile>
+       		 			</ignoreFiles>
+                    </coverage>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mike.codes</groupId>
+                <artifactId>api-manager-plugin</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <configuration>
+                    <credentials>
+                        <username></username>
+                        <password></password>
+                    </credentials>
+                    <exchangeAsset>
+                        <groupId>9a5c9957-32a7-449b-aea6-1ce91fac7061</groupId>
+                        <assetId>beers-process-api</assetId>
+                        <version>1.0.3</version>
+                        <productVersion>v1</productVersion>
+                    </exchangeAsset>
+                    <environment>Sandbox</environment>
+                    <ipWhitelist>
+                        <configurationData>
+                            <ips>
+                                <param>80.80.80.100</param>
+                                <param>80.80.80.101</param>
+                            </ips>
+                            <ipExpression>#[vars.remoteAddress]</ipExpression>
+                        </configurationData>
+                    </ipWhitelist>
+                    <clientIdEnforcement>
+                        <configurationData>
+                            <!-- Most of the Client ID Enforcement is hard coded at the moment so this creates a generic
+                             Client ID Enforcement policy that accepts client id and secret as a Authorization header -->
+                            <isHttpEndpoint>true</isHttpEndpoint>
+                        </configurationData>
+                    </clientIdEnforcement>
+                    <tiers>
+                        <tier>
+                            <status>ACTIVE</status>
+                            <autoApprove>true</autoApprove>
+                            <name>Test</name>
+                            <description>A Test SLA Tier</description>
+                            <limits>
+                                <limit>
+                                    <visible>true</visible>
+                                    <maximumRequests>10</maximumRequests>
+                                    <timePeriodInMilliseconds>60000</timePeriodInMilliseconds>
+                                </limit>
+                            </limits>
+                        </tier>
+                    </tiers>
+                 	<!-- Alerts are WIP -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>apply-policies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <dependencies>
+    	<!-- These dependencies are for the small custom code to resolve URLs better than dataweave can -->
+    	<dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Dependency for alerts via Cloudhub -->
+     	<dependency>
+            <groupId>com.mulesoft.connectors</groupId>
+            <artifactId>mule-cloudhub-connector</artifactId>
+            <version>1.0.1</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    </dependencies>
+
+</project>

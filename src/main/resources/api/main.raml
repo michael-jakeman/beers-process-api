@@ -1,0 +1,88 @@
+#%RAML 1.0
+title: Beers Process API
+version: v1
+mediaType: application/json
+protocols: HTTPS
+description: A Process API that lets you retrieve information about beers, their reviews online, and allows you to create new beer lines.
+
+uses: 
+  library: exchange_modules/9a5c9957-32a7-449b-aea6-1ce91fac7061/mikes-library/1.0.3/mikes-library.raml
+
+types:
+  beers: !include exchange_modules/9a5c9957-32a7-449b-aea6-1ce91fac7061/beers/1.0.6/beers.raml
+  beer: !include exchange_modules/9a5c9957-32a7-449b-aea6-1ce91fac7061/beers/1.0.6/beer.raml
+  review: !include exchange_modules/9a5c9957-32a7-449b-aea6-1ce91fac7061/review/1.0.3/review.raml
+  reviews: !include exchange_modules/9a5c9957-32a7-449b-aea6-1ce91fac7061/review/1.0.3/reviews.raml
+      
+/beers:
+  displayName: Beers
+  description: Perform actions on Beers
+  get:
+    is: [
+         library.filterable, 
+         library.pageable : { maximum: 50 }, 
+         library.searchable
+        ]
+    displayName: Retrieve Beers
+    description: Retrieve a list of Beers
+    responses:
+      200:
+        body:
+          application/json:
+            type: beers
+          
+  post:
+    displayName: Create Beers
+    description: Create a beer
+    body:
+      application/json:
+        type: beer
+    responses:
+      202:
+        body:
+          application/json:
+            type: beer
+
+  /{beerId}:
+    displayName: Beer
+    description: Perform actions on Beer
+    is: [library.filterable]
+    get:
+      displayName: Retrieve a Beer
+      description: Retrieve a single Beer
+      
+      responses:
+        200:
+          body:
+            application/json:
+              type: beer
+    put:
+      displayName: Update or Create a Beer
+      description: Update or Create a single Beer
+      body:
+        application/json:
+          type: beer
+      responses:
+        202:
+          body:
+            application/json:
+              type:
+                beer
+# To be implemented, initially thought of using the Twitter connector but this doesnt exist for Mule 4 and didnt want to integrate another REST HTTP API just to implement the reviews.
+    /reviews:
+      is: [
+         library.filterable, 
+         library.pageable : { maximum: 100 }, 
+         library.searchable
+        ]
+      displayName: Reviews
+      description: A list of Reviews
+      get:
+        displayName: Retrieve Reviews
+        description: Retrieve a list of Reviews
+        responses:
+          200:
+            body:
+              application/json:
+                type: reviews
+        

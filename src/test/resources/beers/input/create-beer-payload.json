@@ -1,0 +1,16 @@
+{
+  "identifier": "tw2Iw0",
+  "name": "Mike's fantastic Beer",
+  "breweries" : [
+	  	{
+	  		"id" : "12345678",
+	  		"name" : "Mikes Brewery",
+	  		"locations" :[
+	  			{
+		  			"name" : "Mikes Main Brewery",
+		  			"countryIsoCode" : "GB"
+	  			}
+			]
+	  	}
+  	]
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:dynamodb="http://www.mulesoft.org/schema/mule/dynamodb" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/dynamodb http://www.mulesoft.org/schema/mule/dynamodb/current/mule-dynamodb.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+	
+	<http:listener-config name="https-listener-config">
+        <http:listener-connection host="0.0.0.0" port="${https.internal.port}" tlsContext="tls-context" protocol="HTTPS"/>
+    </http:listener-config>
+    
+    <apikit:config name="main-config" api="main.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    
+    <http:request-config name="http-brewery-requester-config" doc:name="HTTP Request configuration" doc:id="54220095-8986-4bc8-9237-1529528b0b4c" basePath="${request.http.brewery.base}">
+        <http:request-connection protocol="${request.http.brewery.protocol}" host="${request.http.brewery.host}" port="${request.http.brewery.port}" >
+			<reconnection >
+				<reconnect />
+			</reconnection>
+		</http:request-connection>
+    </http:request-config>
+    
+    <http:request-config name="http-countries-requester-config" doc:name="HTTP Request configuration" doc:id="c5e6fc36-3e7d-44b1-9ed0-c343ff0af6dd" basePath="${request.http.countries.base}">
+		<http:request-connection protocol="${request.http.countries.protocol}" host="${request.http.countries.host}" port="${request.http.countries.port}" >
+			<reconnection >
+				<reconnect />
+			</reconnection>
+		</http:request-connection>
+	</http:request-config>
+    
+    <configuration-properties doc:name="Application Configuration properties" doc:id="019c6345-6ca9-4660-880d-cb6321416170" file="${env}-properties.yaml" />
+    
+    <ee:object-store-caching-strategy name="caching-strategy" doc:name="Caching Strategy" doc:id="5fd2b8a1-b87d-4983-9669-e65193c67211" keyGenerationExpression="${cache.response.key}" objectStore="response-cache"/>
+	
+	<os:object-store name="response-cache" doc:name="Object store" doc:id="32737ea2-877d-42bb-97b5-5b5355c27280" entryTtl="900000" />
+
+	<ee:object-store-caching-strategy name="countries-cache" doc:name="Caching Strategy" doc:id="4f24db08-608b-4b0c-b2cc-3efafcb28c3f" keyGenerationExpression="${cache.countries.key}" objectStore="countries-objectstore"/>
+	
+	<os:object-store name="countries-objectstore" doc:name="Object store" doc:id="45038247-fc61-43d3-9780-4e9f1c49cbe7" />
+	
+	<jms:config name="beers-jms-config" doc:name="JMS Config" doc:id="88bf846b-7347-48fd-a379-719a9450535b" >
+		<jms:active-mq-connection username="${jms.beers.user}" password="${jms.beers.password}" >
+			<jms:factory-configuration brokerUrl="${jms.beers.url}" />
+		</jms:active-mq-connection>
+	</jms:config>
+	
+	<tls:context name="tls-context" doc:name="TLS Context" doc:id="e82df8ed-bb33-4cb7-bab0-a088a73b1fd0" >
+		<tls:key-store type="jks" path="keystore.jks" keyPassword="${https.keystore.password}" password="${https.keystore.password}" />
+	</tls:context>
+	
+	<!-- This value is so developers can run locally easily, for any other environment Cloudhub will overwrite the env value -->
+	<!-- Also used for MUnit tests as currently unable to omit files from unit tests -->
+	<global-property doc:name="Global Property" doc:id="6f588e12-5480-4fe8-9017-f3af2a42869f" name="env" value="dev" />
+	
+	<cloudhub:config name="cloudhub-alerts-config" doc:name="CloudHub Config" doc:id="95df720b-0a0b-414b-ab25-1f14adf00fc4" >
+		<cloudhub:connection username="${cloudhub.username}" password="${cloudhub.password}" environment="${cloudhub.environment}" />
+	</cloudhub:config>
+	
+</mule>

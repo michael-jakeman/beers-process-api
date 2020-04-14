@@ -1,0 +1,22 @@
+{
+  "id": "https://127.0.0.1:8092/v1/beers/tw2Iw0",
+  "identifier" : "tw2Iw0",
+  "name": "Mike's fantastic Beer",
+  "breweries": [
+    {
+      "id": "https://127.0.0.1:8092/v1/breweries/12345678",
+      "identifier": "12345678",
+      "name": "Mikes Brewery",
+      "locations": [
+        {
+          "name": "Mikes Main Brewery",
+          "country": {
+            "name": "United Kingdom of Great Britain and Northern Ireland",
+            "flag": "https://restcountries.eu/data/gbr.svg",
+            "population": 65110000
+          }
+        }
+      ]
+    }
+  ]
+}

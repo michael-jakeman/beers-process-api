@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	
+	<munit:config name="test-suite.xml" />
+	
+	<munit:test name="valid-country-cache-transformation-test" doc:id="b08f9ebb-4fab-446b-bafd-5a35c91a80b8" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock request to get countries" doc:id="ac6f7cef-cba2-4ec3-b932-2881bb630520" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="bade603c-9d61-4860-8772-d2f67a934002" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://countries/input/countries-response.json', 'application/json')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="get-countries-sub-flow" doc:id="c58fc965-4ac3-4372-b0f3-e930e08b55e5" name="get-countries-sub-flow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that expression="#[output application/json ---payload]" is="#[MunitTools::equalTo(readUrl('classpath://countries/output/countries-cached-value.json', 'application/json'))]" message="The response payload is incorrect!" doc:name="Assert that country map is in valid format" />
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="delete-all-variables-except-correlationId-test" doc:id="224de6b3-6195-44f6-b069-6d3b480d4ada" >
+		<munit:execution >
+			<ee:transform doc:name="Set variables" doc:id="211c04d0-589c-4375-84e2-9d1a266f29ce" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable resource="variables/set-dummy-variable.dwl" variableName="anotherVariable" />
+					<ee:set-variable resource="variables/set-id-variable.dwl" variableName="id" />
+					<ee:set-variable resource="variables/set-correlation-id.dwl" variableName="correlationId" />
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="delete-all-flow-variables-sub-flow" doc:id="8b758a40-aa59-4bd7-9362-653a07dff53d" name="delete-all-flow-variables-sub-flow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-equals doc:name="Assert size of vars is 1" doc:id="646eeda3-e1c9-4d9d-a6ce-7011e41f31c9" actual="#[output application/json --- sizeOf(vars) == 1]" expected="#[true]" message="There were more or less than 1 variable left in the list of variables"/>
+			<munit-tools:assert-that doc:name="Assert that correlation ID variable" doc:id="1d3a5d82-cb0c-4e36-bfd8-aae6193572c1" message="Correlation ID was null..." expression="#[vars.correlationId]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:before-test name="clear-caches-before-test" doc:id="dc890bb2-ba12-4c3b-a222-886cef5303a8" >
+		<os:clear doc:name="Clear countries-objectstore" doc:id="85bb1827-e272-4050-a48d-b6ab8d0d5787" objectStore="countries-objectstore"/>
+		<os:clear doc:name="Clear response-cache" doc:id="8a60cbca-1068-41d1-8767-a55998267567" objectStore="response-cache"/>
+	</munit:before-test>
+	
+	<munit:test name="get-beers-collection-successful-test" doc:id="6e21de1b-eea8-4bea-b65f-b0151c59ec5f" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when retrieving beers from Brewery API" doc:id="cb2994d2-bcba-4194-b33a-7f91fecbb0bb" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="a86d8065-81a4-40e1-97de-54ffab0335cc" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://beers/input/beers-api-response.json', 'application/json')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="Set Correlation ID and URI variables" doc:id="5eef3a42-9990-48ad-a545-c6c555004f39" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable resource="beers/input/set-correlation-id.dwl" variableName="correlationId" />
+					<ee:set-variable resource="beers/input/set-beers-uri.dwl" variableName="uri" />
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="get:\beers:main-config" doc:id="e8e9f8b5-68c7-4f9c-8e74-139da3ffca69" name="get:\beers:main-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that the payload is as expected" doc:id="27671c78-378a-417a-8a44-dfbd2574baf4" message="The response payload is incorrect!" expression="#[output application/json ---payload]" is="#[MunitTools::equalTo(readUrl('classpath://beers/output/beers-response.json', 'application/json'))]" />
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="get-single-beer-successful-test" doc:id="7092eae1-56b9-45e1-aacd-57d43699c039" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when retrieving beer from Brewery API" doc:id="204d6d79-2f26-42da-8ad2-e6cb3c615b83" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f05241c1-61e6-4215-b9db-107fc6201c1c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://beers/input/beer-api-response.json', 'application/json')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock request to get countries" doc:id="1b4196c8-2fa4-40a6-a201-31b0c2e013f0" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="bade603c-9d61-4860-8772-d2f67a934002" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://countries/input/countries-us-response.json', 'application/json')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>	
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set attribute for uri parameter beerId" doc:id="4c800278-5e78-4b38-9a4d-9d8e1c8be2d2" >
+				<munit:attributes value="#[{uriParams : {'beerId' :'c4f2KE'}}]" />			
+			</munit:set-event>
+			<ee:transform doc:name="Set URI variable and Correlation ID" doc:id="4ba246db-920b-4c96-9beb-b399aa394824" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable resource="beers/input/set-correlation-id.dwl" variableName="correlationId" />
+					<ee:set-variable resource="beers/input/set-beer-uri.dwl" variableName="uri" />
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="get:\beers\(beerId):main-config" doc:id="f48165f3-9b31-448b-aef4-c2bc71878119" name="get:\beers\(beerId):main-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that the payload is as expected" doc:id="b1efc18f-43ce-461d-9917-c8dd920dc9b8" message="The response payload is incorrect!" expression="#[output application/json ---payload]" is="#[MunitTools::equalTo(readUrl('classpath://beers/output/beer-response.json', 'application/json'))]" />
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="get-single-beer-failure-test" doc:id="d9ef6137-ebca-4d92-82ef-1b417263ea95" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when retrieving beer from Brewery API" doc:id="685e6c77-4bf6-46f4-97ae-2b01ed548341" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f05241c1-61e6-4215-b9db-107fc6201c1c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://beers/input/beer-api-error-response.json', 'application/json')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock request to get countries" doc:id="b879fd97-42ed-449d-a399-4dde7fffbe09" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="bade603c-9d61-4860-8772-d2f67a934002" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://countries/input/countries-us-response.json', 'application/json')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>	
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set attribute for uri parameter beerId" doc:id="4b18712c-46c3-4a67-b70e-c0a7495a0df2" >
+				<munit:attributes value="#[{uriParams : {'beerId' :'c4f2KZ'}}]" />			
+			</munit:set-event>
+			<ee:transform doc:name="Set URI variable and Correlation ID" doc:id="1e2c2cf2-daad-4ee5-9967-d1072a40f8a9" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable resource="beers/input/set-correlation-id.dwl" variableName="correlationId" />
+					<ee:set-variable resource="beers/input/set-empty-beer-uri.dwl" variableName="uri" />
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="get:\beers\(beerId):main-config" doc:id="c58bbad6-155b-4b9b-a094-331a6cdec500" name="get:\beers\(beerId):main-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that the payload is as expected" doc:id="ca528b99-a00d-4099-a4d8-8740c7a8fac0" message="The response payload is incorrect!" expression="#[output application/json ---payload]" is="#[MunitTools::equalTo(readUrl('classpath://beers/output/empty-beer-response.json', 'application/json'))]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="create-beer-and-cache-test" doc:id="faa533c2-5f33-4d43-b0cb-67affb6e6077" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock request to get countries" doc:id="e756bec9-f83e-4fe4-ba4e-fb9c23ee43f8" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="bade603c-9d61-4860-8772-d2f67a934002" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://countries/input/countries-gb-response.json', 'application/json')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock publish message via ActiveMQ" doc:id="6a86ea2f-9f42-46ac-9215-9210e851fd90" processor="jms:publish">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ad30d330-e927-4956-ae59-7c3f5e52e1ab" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event Payload and Atrributes" doc:id="8bd3e8bc-870c-4884-8ce4-1a8cf29c735a" >
+				<munit:payload value="#[readUrl('classpath://beers/input/create-beer-payload.json', 'application/json')]" encoding="UTF-8" mediaType="application/java" />
+				<munit:attributes value="#[{uriParams : {'beerId' :'tw2Iw0'}}]" />
+			</munit:set-event>
+			<ee:transform doc:name="Set URI variable and Correlation ID" doc:id="b5564eb7-3c67-4f73-9caa-f711d1b176ab" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable resource="beers/input/set-correlation-id.dwl" variableName="correlationId" />
+					<ee:set-variable resource="variables/set-create-beer-uri.dwl" variableName="uri" />
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="put:\beers\(beerId):application\json:main-config" doc:id="68b0984d-2ca2-4d4f-9584-936593932525" name="put:\beers\(beerId):application\json:main-config"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that the payload is as expected" doc:id="8d4208bd-6a0f-46e6-a2b6-9f85a13999c6" message="The response payload is incorrect!" expression="#[output application/json ---payload]" is="#[MunitTools::equalTo(readUrl('classpath://beers/output/beer-created.json', 'application/json'))]" />
+		</munit:validation>
+	</munit:test>
+
+</mule>

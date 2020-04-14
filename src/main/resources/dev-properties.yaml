@@ -1,0 +1,53 @@
+https:
+  internal:
+    port: "8092"
+  keystore:
+    password: ""
+
+request:
+  http:
+# Countries API Configuration
+    countries:
+      protocol: "HTTPS"
+      host: "restcountries.eu"
+      port: "443"
+      base: "/rest/v2"
+      url:
+        countries: "/all"
+# Breweries API Configuration
+    brewery:
+      protocol: "HTTPS"
+      host: "sandbox-api.brewerydb.com"
+      port: "443"
+      base: "/v2"
+      url:
+        beers: "/beers"
+        beer: "/beer/{beerId}"
+      auth:
+        key: "" 
+          
+cache:
+  countries:
+    key: "countries"
+  response:
+    key: "#[vars.key]"
+          
+api:
+  major:
+    version: "/v1"
+          
+jms:
+  beers:
+    user: ""
+    password: ""
+    url: "ssl://b-36beca72-2946-41e5-95b7-800147d18982-1.mq.us-east-1.amazonaws.com:61617"
+    topics: 
+      beers: "beers" 
+          
+          
+cloudhub:
+  username: ""
+  password: ""
+  environment: "Sandbox"
+
+  

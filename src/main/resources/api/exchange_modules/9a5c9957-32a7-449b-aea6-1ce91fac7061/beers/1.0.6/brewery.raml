@@ -1,0 +1,47 @@
+#%RAML 1.0 DataType
+displayName: Beer
+description: 
+example: !include examples/brewery.json
+properties:
+  identifier:
+    displayName: Identifier
+    description: The identifier for the brewery
+    type: string
+    example: "123456789"
+    required: false
+  name:
+    displayName: Name
+    description: The Name of the Brewery
+    required: false
+    example: "Mikes Brewery"
+  locations:
+    type: array
+    minItems: 0
+    required: false
+    items:
+      properties:
+        name:
+          example: "Mikes Main Brewery"
+          required: false
+          displayName: Location Name"
+        countryIsoCode:
+          required: false
+          description: Used when creating a beer, is never returned as part of the object but used as a lookup
+          example:  "GB"
+        country:
+          required: false
+          type: object
+          properties:
+            name:
+              displayName: Country Name
+              required: false
+              example: "United Kingdom of Great Britain and Northern Ireland"
+            flag:
+              displayName: Country Flag
+              required: false
+              example: "https://restcountries.eu/data/gbr.svg"
+            population:
+              displayName: Country Population
+              required: false
+              type: number
+              example: 65110000

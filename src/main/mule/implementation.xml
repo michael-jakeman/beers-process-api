@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:amqp="http://www.mulesoft.org/schema/mule/amqp" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+    
+	<!-- TODO: Ensure that all Dataweave components are stored in files -->
+	<!-- TODO: Update the RAML and common exchange libraries -->
+	<!-- TODO: Parameterise the Key in the Beers API -->
+	<!-- TODO: Add a standard errors component into the RAML -->
+	<flow name="put:\beers\(beerId):application\json:main-config">
+        <set-variable value="#[attributes.uriParams.'beerId' as String]" doc:name="Set key vars to upsert against objectstore for write-through-cache" doc:id="864cbdcc-0ecd-40e9-875a-90608b0b6471" variableName="key"/>
+		<flow-ref doc:name="Retrieve the countries cache value and store in countries variable" doc:id="cb46b992-9d66-4ffc-b7dd-e5478d875562" name="get-countries-sub-flow" target="countries" />
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Transform payload to JSON (Domain Model)">
+            <ee:message>
+				<ee:set-payload resource="dw/beers/generate-create-beer-payload.dwl" />
+            </ee:message>
+        </ee:transform>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="5b949dc1-c5f6-4a01-8ea9-b6ef692386d3" target="temp">
+			<route>
+				<jms:publish doc:name="Publish message to ActiveMQ Beers Topic" doc:id="ad30d330-e927-4956-ae59-7c3f5e52e1ab" destinationType="TOPIC" config-ref="beers-jms-config" destination="${jms.beers.topics.beers}"/>
+			</route>
+			<route>
+				<!-- TODO: Enrich the payload -->
+				<ee:transform doc:name="Serialize the payload before caching" doc:id="00c3a612-8deb-4ea3-9653-ea2475dd4696">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+//TODO: Enrich the payload that's going to be cached'
+write(payload, "application/json")]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<os:store doc:name="Store write-through cache value for Beer" doc:id="ce8fefd2-2ace-4ec7-9e5b-e18e2502ac01" key="#[vars.key]" objectStore="response-cache" />
+			</route>
+		</scatter-gather>
+		<flow-ref doc:name="log-end-sub-flow" doc:id="27b5cfae-7449-4030-8cc6-fadfa2403768" name="log-end-sub-flow"/>
+    </flow>
+    
+    <flow name="get:\beers\(beerId):main-config">
+        <set-variable value="#[attributes.uriParams.beerId as String]" doc:name="Set key vars for cache as beerId" doc:id="f2c627ac-fe46-47b5-adb0-ee0998f4fd6d" variableName="key"/>
+		<os:contains doc:name="Check if the objectstore contains the write-through cache value" doc:id="84021cdd-7b3c-46ab-b43b-b010c84bd0b5" key="#[vars.key]" objectStore="response-cache"/>
+		<choice doc:name="Choice" doc:id="41c7e114-d93e-46ef-9a26-9715528e19c3" >
+			<when expression="#[payload]">
+				<os:retrieve doc:name="Retrieve the stored value from the objecstore" doc:id="9f09af56-c495-4bd7-8f3f-06edc9870265" key="#[vars.key]" objectStore="response-cache"/>
+			</when>
+			<otherwise >
+				<ee:cache doc:name="Cache Response based on Beer ID" doc:id="9d946ab9-2024-4473-b95f-2cfa5751e195" cachingStrategy-ref="caching-strategy">
+			<scatter-gather doc:name="Scatter-Gather" doc:id="6800e5d2-e185-4805-a101-2eced4fbbba5">
+			<route>
+				<flow-ref doc:name="Access countries cache and store as countries variable" doc:id="f1472d89-a40a-486f-b87f-190681368dae" name="get-countries-sub-flow" target="countries" />
+			</route>
+			<route>
+				<http:request method="GET" doc:name="Request Beer from Brewery API" doc:id="f05241c1-61e6-4215-b9db-107fc6201c1c" config-ref="http-brewery-requester-config" path="${request.http.brewery.url.beer}">
+					<http:uri-params><![CDATA[#[output application/java
+---
+{
+	beerId : vars.key
+}]]]></http:uri-params>
+					<http:query-params><![CDATA[#[output application/java
+---
+{
+	withBreweries : "Y",
+	key : p('request.http.brewery.auth.key')
+}]]]></http:query-params>
+				</http:request>
+			</route>
+		</scatter-gather>
+		<!-- TODO: Add the negative scenario into the dataweave for if the beer doesnt exist in the DB return a 404 -->
+			<ee:transform doc:name="Transform into Domain Model" doc:id="9fd9af88-00de-49c4-a4c6-a64d47c17dae">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+import java!com::mike::ResolveUri
+var beer = payload[1].payload.data
+var countries = vars.countries as Object
+output application/json
+---
+//TODO: Add negative scenario here
+write(({
+	id: vars.uri.full,
+	identifier: beer.id,
+	name: beer.name,
+	abv: beer.abv,
+	breweries: beer.breweries map (brewery) -> {
+		// Resolve is in src/main/java and is a basic wrapper of the java URI object to allow relative path manipulation
+		id: ResolveUri::resolve(vars.uri.full, ("./../breweries/" ++ brewery.id)),
+		identifier: brewery.id,
+		name: brewery.name,
+		locations: (brewery.locations) map (location) -> using ( country = countries[location."countryIsoCode"]) {
+			name: location.name,
+			country: {
+				name: country.name,
+				flag: country.flag,
+				population: country.population
+			}
+		}
+	}
+}), "application/json")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+					<flow-ref doc:name="delete-all-flow-variables-sub-flow" doc:id="8f28b1d8-05d5-4730-8a8f-b60975fe0231" name="delete-all-flow-variables-sub-flow" />
+		</ee:cache>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform to JSON" doc:id="bd3e8272-d6f4-4886-a29e-9a4ffac7891e" >
+			<ee:message >
+				<ee:set-payload resource="dw/utils/convert-string-to-json-object.dwl" />
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="log-end-sub-flow" doc:id="73c02546-3446-4b9c-b2d9-f8faa3acc67d" name="log-end-sub-flow"/>
+    </flow>
+    <flow name="get:\beers:main-config">
+		<set-variable value="#[vars.uri.full]" doc:name="Set key vars for cache as uri" doc:id="a5922023-7996-4257-9c85-ad05dc0db195" variableName="key"/>
+		<ee:cache doc:name="Cache Response based on URI" doc:id="6dd1a826-e87c-4491-8c6b-2426455b811d" cachingStrategy-ref="caching-strategy">
+			<ee:transform doc:name="Store Query params" doc:id="08e2da9b-59aa-4236-97a0-b7f29547ab66">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable resource="dw/beers/generate-request-query-params.dwl" variableName="queryParams" />
+				<ee:set-variable resource="dw/beers/generate-filterable-items.dwl" variableName="filter" />
+			</ee:variables>
+		</ee:transform>
+			<http:request method="GET" doc:name="Request Beers from Brewery API" doc:id="a86d8065-81a4-40e1-97de-54ffab0335cc" config-ref="http-brewery-requester-config" path="${request.http.brewery.url.beers}">
+				<http:query-params><![CDATA[#[output application/java
+---
+{
+	key : p('request.http.brewery.auth.key')
+} ++ vars.queryParams]]]></http:query-params>
+        </http:request>
+			<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Transform to Domain Model">
+            <ee:message>
+                <ee:set-payload resource="dw/beers/transform-response.dwl" />
+            </ee:message>
+        </ee:transform>
+			<flow-ref doc:name="delete-all-flow-variables-sub-flow" doc:id="993de8fd-3baa-4c74-90b4-13d6ff8d7a3a" name="delete-all-flow-variables-sub-flow"/>
+		</ee:cache>
+		<ee:transform doc:name="Transform to JSON" doc:id="2bc8ab35-7ec3-4d4e-a634-f803e54736c5" >
+			<ee:message >
+				<ee:set-payload resource="dw/utils/convert-string-to-json-object.dwl" />
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="log-end-sub-flow" doc:id="8c2ce10c-cf61-42c8-a611-a328c29d5a58" name="log-end-sub-flow"/>
+    </flow>
+    <!-- TODO: Find a social media connector that can return reviews - Twitter doesnt work anymore -->
+    <flow name="get:\beers\(beerId)\reviews:main-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="beerId">attributes.uriParams.'beerId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  id: "https://mike.com/reviews?limit=100",
+  totalNumberOfItems: 100000,
+  numberOfItems: 1,
+  items: [
+    {
+      id: "1",
+      identifier: "https://mike.com/v1/reviews/1",
+      content: "A fantastic beer!"
+    }
+  ]
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    
+    <!-- Remove POST Beers as it doesnt show any implementation, only knowledge of REST -->
+    <flow name="post:\beers:application\json:main-config">
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  id: "1",
+  identifier: "https://mike.com/v1/beers/1",
+  name: "Mike Beer"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

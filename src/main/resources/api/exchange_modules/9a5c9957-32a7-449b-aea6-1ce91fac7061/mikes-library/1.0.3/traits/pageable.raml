@@ -1,0 +1,19 @@
+#%RAML 1.0 Trait
+description: The request is filterable
+displayName: Filterable
+queryParameters:
+  limit:
+    type: number
+    displayName: Limit
+    description: The total number of resources returned in the list
+    example: 50
+    maximum: 50
+    default: 50
+    required: false
+  offset:
+    type: number
+    displayName: Offset
+    description: The position through the array
+    example: 50
+    default: 0
+    required: false

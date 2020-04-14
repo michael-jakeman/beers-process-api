@@ -1,0 +1,31 @@
+{
+  "id": "http://localhost:8092/v1/beers/c4f2KE",
+  "identifier": "c4f2KE",
+  "name": "'Murican Pilsner",
+  "abv": "5.5",
+  "breweries": [
+    {
+      "id": "http://localhost:8092/v1/breweries/nHLlnK",
+      "identifier": "nHLlnK",
+      "name": "Sierra Nevada Brewing Company",
+      "locations": [
+        {
+          "name": "Main Brewery",
+          "country": {
+            "name": "United States of America",
+            "flag": "https://restcountries.eu/data/usa.svg",
+            "population": 323947000
+          }
+        },
+        {
+          "name": "Asheville",
+          "country": {
+            "name": "United States of America",
+            "flag": "https://restcountries.eu/data/usa.svg",
+            "population": 323947000
+          }
+        }
+      ]
+    }
+  ]
+}

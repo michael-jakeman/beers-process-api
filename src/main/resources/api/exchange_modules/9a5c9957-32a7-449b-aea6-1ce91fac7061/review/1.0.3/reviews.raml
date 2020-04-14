@@ -1,0 +1,23 @@
+#%RAML 1.0 DataType
+displayName: Reviews
+description: A list of Reviews
+example: !include examples/reviews.json
+properties:
+  id:
+    type: string
+    example: "https://mike.com/v1/reviews"
+    displayName: Id
+    description: The unique identifier for this resource
+  totalNumberOfItems:
+    type: number
+    example: 14141
+    displayName: Total Number of Items
+    description: The total number of items in the database
+  numberOfItems:
+    type: number
+    example: 100
+    displayName: Number of Items 
+    description: The total number of items returned in the response
+  items:
+    type: array
+    items: !include review.raml

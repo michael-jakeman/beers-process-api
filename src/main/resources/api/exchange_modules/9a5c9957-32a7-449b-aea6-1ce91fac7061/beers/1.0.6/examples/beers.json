@@ -1,0 +1,12 @@
+{
+  "id" : "https://mike.com/beers?limit=100",
+  "totalNumberOfItems" : 100000,
+  "numberOfItems" : 1,
+  "items" : [
+    {
+      "id" : "1",
+      "identifier" : "https://mike.com/v1/beers/1",
+      "name": "Mike Beer"
+    }
+  ]
+}

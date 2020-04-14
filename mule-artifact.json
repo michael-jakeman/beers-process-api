@@ -1,0 +1,11 @@
+{
+  "minMuleVersion": "4.2.2",
+  "classLoaderModelLoaderDescriptor": {
+        "id": "mule",
+        "attributes": {
+            "exportedPackages": [
+                "com.mike"
+            ]
+        }
+    }
+}

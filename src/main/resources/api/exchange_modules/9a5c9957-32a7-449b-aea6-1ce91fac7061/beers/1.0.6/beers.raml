@@ -1,0 +1,23 @@
+#%RAML 1.0 DataType
+displayName: Beers
+description: A list of Beers
+example: !include examples/beers.json
+properties:
+  id:
+    type: string
+    example: "https://mike.com/v1/beers"
+    displayName: Id
+    description: The unique identifier for this resource
+  totalNumberOfItems:
+    type: number
+    example: 14141
+    displayName: Total Number of Items
+    description: The total number of items in the database
+  numberOfItems:
+    type: number
+    example: 100
+    displayName: Number of Items 
+    description: The total number of items returned in the response
+  items:
+    type: array
+    items: !include beer.raml

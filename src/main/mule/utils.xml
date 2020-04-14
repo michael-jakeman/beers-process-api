@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="delete-all-flow-variables-sub-flow" doc:id="a9dbd5ba-9e20-4ea1-875f-4794700cff83" >
+		<foreach doc:name="For Each Flow Variable" doc:id="a7adf732-3b85-459b-bc66-428a413ee510" collection="#[vars]">
+			<choice doc:name="Variable Name != correlationId" doc:id="fed978b6-93be-453d-b6a9-65ea73c91550" >
+				<when expression='((payload pluck $$)[0] as String) == "correlationId"'>
+					<logger level="DEBUG" doc:name="DEBUG: Skipping deletion of correlationId" doc:id="38650400-e7f5-46a9-a207-22d1ccd1a721" message="Found correlationId, skipping delete"/>
+				</when>
+				<otherwise >
+					<remove-variable doc:name="Dynamically remove variable" doc:id="8d00cbf1-dc78-4fe7-beee-8c1b27c7219a" variableName="#[(payload pluck $$)[0]]" />
+				</otherwise>
+			</choice>
+		</foreach>
+	</sub-flow>
+	<sub-flow name="log-end-sub-flow" doc:id="5b52707f-1eda-45ec-85f3-3cca846b88c8" >
+		<logger level="INFO" doc:name="Log the end of the flow" doc:id="ac07254a-1b12-420b-8b79-7a020e8557ef" message="Successfully processed correlationId : #[vars.correlationId]" category="com.mike"/>
+	</sub-flow>
+</mule>

@@ -1,0 +1,143 @@
+{
+    "message": "READ ONLY MODE: Request Successful",
+    "data": {
+        "id": "c4f2KE",
+        "name": "'Murican Pilsner",
+        "nameDisplay": "'Murican Pilsner",
+        "abv": "5.5",
+        "glasswareId": 4,
+        "styleId": 98,
+        "isOrganic": "N",
+        "isRetired": "N",
+        "labels": {
+            "icon": "https://brewerydb-images.s3.amazonaws.com/beer/c4f2KE/upload_jjKJ7g-icon.png",
+            "medium": "https://brewerydb-images.s3.amazonaws.com/beer/c4f2KE/upload_jjKJ7g-medium.png",
+            "large": "https://brewerydb-images.s3.amazonaws.com/beer/c4f2KE/upload_jjKJ7g-large.png",
+            "contentAwareIcon": "https://brewerydb-images.s3.amazonaws.com/beer/c4f2KE/upload_jjKJ7g-contentAwareIcon.png",
+            "contentAwareMedium": "https://brewerydb-images.s3.amazonaws.com/beer/c4f2KE/upload_jjKJ7g-contentAwareMedium.png",
+            "contentAwareLarge": "https://brewerydb-images.s3.amazonaws.com/beer/c4f2KE/upload_jjKJ7g-contentAwareLarge.png"
+        },
+        "status": "verified",
+        "statusDisplay": "Verified",
+        "createDate": "2013-08-19 11:58:12",
+        "updateDate": "2018-11-02 02:15:14",
+        "glass": {
+            "id": 4,
+            "name": "Pilsner",
+            "createDate": "2012-01-03 02:41:33"
+        },
+        "style": {
+            "id": 98,
+            "categoryId": 8,
+            "category": {
+                "id": 8,
+                "name": "North American Lager",
+                "createDate": "2012-03-21 20:06:46"
+            },
+            "name": "American-Style Pilsener",
+            "shortName": "American Pilsener",
+            "description": "This classic and unique pre-Prohibition American-style Pilsener is straw to deep gold in color. Hop bitterness, flavor and aroma are medium to high, and use of noble-type hops for flavor and aroma is preferred. Up to 25 percent corn and/or rice in the grist should be used. Malt flavor and aroma are medium. This is a light-medium to medium-bodied beer. Sweet corn-like dimethylsulfide (DMS), fruity esters and American hop-derived citrus flavors or aromas should not be perceived. Diacetyl is not acceptable. There should be no chill haze. Competition organizers may wish to subcategorize this style into rice and corn subcategories.",
+            "ibuMin": "25",
+            "ibuMax": "40",
+            "abvMin": "5",
+            "abvMax": "6",
+            "srmMin": "3",
+            "srmMax": "6",
+            "ogMin": "1.045",
+            "fgMin": "1.012",
+            "fgMax": "1.018",
+            "createDate": "2012-03-21 20:06:46",
+            "updateDate": "2015-04-07 15:40:08"
+        },
+        "breweries": [
+            {
+                "id": "nHLlnK",
+                "name": "Sierra Nevada Brewing Company",
+                "nameShortDisplay": "Sierra Nevada",
+                "description": "The Sierra Nevada Brewing Company was established in 1980 by homebrewers Ken Grossman and Paul Camusi. Camusi retired in 1998 and sold his share in the company to Grossman.\r\n\r\nLocated in Chico, California, Sierra Nevada Brewing is one of the most popular craft breweries currently operating in the United States. Its Pale Ale is world renowned, and the brewery produces almost 700,000 barrels of beer per year. Sierra Nevada's Pale Ale is the second best-selling craft beer in the United States, behind the Boston Beer Company's Samuel Adams Boston Lager.\r\n\r\nSierra Nevada's specialty brews include the winter seasonal Celebration, which is similar to the pale ale, but hoppier; and Summerfest, a lager which is citrusy and sunny.",
+                "website": "http://www.sierranevada.com/",
+                "established": "1980",
+                "isOrganic": "N",
+                "images": {
+                    "icon": "https://brewerydb-images.s3.amazonaws.com/brewery/nHLlnK/upload_IClwuZ-icon.png",
+                    "medium": "https://brewerydb-images.s3.amazonaws.com/brewery/nHLlnK/upload_IClwuZ-medium.png",
+                    "large": "https://brewerydb-images.s3.amazonaws.com/brewery/nHLlnK/upload_IClwuZ-large.png",
+                    "squareMedium": "https://brewerydb-images.s3.amazonaws.com/brewery/nHLlnK/upload_IClwuZ-squareMedium.png",
+                    "squareLarge": "https://brewerydb-images.s3.amazonaws.com/brewery/nHLlnK/upload_IClwuZ-squareLarge.png"
+                },
+                "status": "verified",
+                "statusDisplay": "Verified",
+                "createDate": "2012-01-03 02:42:08",
+                "updateDate": "2018-11-02 02:15:01",
+                "isMassOwned": "N",
+                "isInBusiness": "Y",
+                "isVerified": "N",
+                "locations": [
+                    {
+                        "id": "IaQrxj",
+                        "name": "Main Brewery",
+                        "streetAddress": "1075 East 20th St",
+                        "locality": "Chico",
+                        "region": "California",
+                        "postalCode": "95928",
+                        "phone": "530-893-3520",
+                        "website": "http://www.sierranevada.com/",
+                        "latitude": 39.7246028,
+                        "longitude": -121.8157154,
+                        "isPrimary": "Y",
+                        "inPlanning": "N",
+                        "isClosed": "N",
+                        "openToPublic": "Y",
+                        "locationType": "micro",
+                        "locationTypeDisplay": "Micro Brewery",
+                        "countryIsoCode": "US",
+                        "yearOpened": "1980",
+                        "status": "verified",
+                        "statusDisplay": "Verified",
+                        "createDate": "2012-01-03 02:42:08",
+                        "updateDate": "2018-11-02 02:14:56",
+                        "country": {
+                            "isoCode": "US",
+                            "name": "UNITED STATES",
+                            "displayName": "United States",
+                            "isoThree": "USA",
+                            "numberCode": 840,
+                            "createDate": "2012-01-03 02:41:33"
+                        }
+                    },
+                    {
+                        "id": "aqLvLE",
+                        "name": "Asheville",
+                        "streetAddress": "100 Sierra Nevada Way",
+                        "locality": "Fletcher",
+                        "region": "North Carolina",
+                        "postalCode": "28732",
+                        "latitude": 35.4303824,
+                        "longitude": -82.5489214,
+                        "isPrimary": "N",
+                        "inPlanning": "N",
+                        "isClosed": "N",
+                        "openToPublic": "Y",
+                        "locationType": "micro",
+                        "locationTypeDisplay": "Micro Brewery",
+                        "countryIsoCode": "US",
+                        "status": "verified",
+                        "statusDisplay": "Verified",
+                        "createDate": "2012-03-29 20:56:05",
+                        "updateDate": "2018-11-02 02:14:56",
+                        "timezoneId": "America/New_York",
+                        "country": {
+                            "isoCode": "US",
+                            "name": "UNITED STATES",
+                            "displayName": "United States",
+                            "isoThree": "USA",
+                            "numberCode": 840,
+                            "createDate": "2012-01-03 02:41:33"
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    "status": "success"
+}

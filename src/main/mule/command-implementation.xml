@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub"
+	xmlns:dynamodb="http://www.mulesoft.org/schema/mule/dynamodb"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/dynamodb http://www.mulesoft.org/schema/mule/dynamodb/current/mule-dynamodb.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="system-layer-command-implementation-flow" doc:id="718c8509-773f-433a-a1f5-9fb907adf4bd" >
+		<jms:listener doc:name="Listener" doc:id="5a646854-b268-419b-a1db-2e53f8604550" config-ref="beers-jms-config" destination="${jms.beers.topics.beers}" ackMode="MANUAL" numberOfConsumers="1">
+			<jms:consumer-type >
+				<jms:topic-consumer subscriptionName="beers-process-api" shared="true"/>
+			</jms:consumer-type>
+		</jms:listener>
+		<!-- TODO: Add the Dynamo DB Connector and Error handling to this flow -->
+		<jms:ack doc:name="Ack the message as successfully processed" doc:id="d48a61c8-65b8-494e-87ab-247f7f9d27a6" ackId="#[attributes.ackId]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="fb416c2f-366a-4432-970a-a47d76876156" >
+				<ee:transform doc:name="Store errorMessage variable to be published" doc:id="1f8502c7-3ca8-4d3b-a210-597a8642428e" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable resource="dw/errors/generate-command-error-message.dwl" variableName="errorMessage" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="publish-error-sub-flow" doc:id="d3a42d48-1e80-4baa-8ffc-1ef54fa958cd" name="publish-error-sub-flow"/>
+				
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

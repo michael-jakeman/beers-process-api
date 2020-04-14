@@ -1,0 +1,12 @@
+{
+  "id" : "https://mike.com/reviews?limit=100",
+  "totalNumberOfItems" : 100000,
+  "numberOfItems" : 1,
+  "items" : [
+    {
+      "id" : "1",
+      "identifier" : "https://mike.com/v1/reviews/1",
+      "content": "A fantastic beer!"
+    }
+  ]
+}

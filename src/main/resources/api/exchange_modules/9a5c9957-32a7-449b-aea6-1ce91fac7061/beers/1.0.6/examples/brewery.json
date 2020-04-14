@@ -1,0 +1,14 @@
+{
+  "identifier": "12345678",
+  "name": "Mikes Brewery",
+  "locations": [
+    {
+      "name": "Mikes Main Brewery",
+      "country": {
+        "name": "United Kingdom of Great Britain and Northern Ireland",
+        "flag": "https://restcountries.eu/data/gbr.svg",
+        "population": 65110000
+      }
+    }
+  ]
+}

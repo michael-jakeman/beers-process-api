@@ -1,0 +1,10 @@
+#%RAML 1.0 Trait
+description: The request is filterable
+displayName: Filterable
+queryParameters:
+  fields:
+    type: string
+    displayName: Fields
+    description: A comma separated list of fields to be returned to the client. Use dot notation to request nested fields
+    example: "name,review.name"
+    required: false
