@@ -4,9 +4,6 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 http://www.mulesoft.org/schema/mule/amqp http://www.mulesoft.org/schema/mule/amqp/current/mule-amqp.xsd
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
     
-	<!-- TODO: Ensure that all Dataweave components are stored in files -->
-	<!-- TODO: Update the RAML and common exchange libraries -->
-	<!-- TODO: Parameterise the Key in the Beers API -->
 	<!-- TODO: Add a standard errors component into the RAML -->
 	<flow name="put:\beers\(beerId):application\json:main-config">
         <set-variable value="#[attributes.uriParams.'beerId' as String]" doc:name="Set key vars to upsert against objectstore for write-through-cache" doc:id="864cbdcc-0ecd-40e9-875a-90608b0b6471" variableName="key"/>
@@ -24,11 +21,7 @@ http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/
 				<!-- TODO: Enrich the payload -->
 				<ee:transform doc:name="Serialize the payload before caching" doc:id="00c3a612-8deb-4ea3-9653-ea2475dd4696">
 					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/java
----
-//TODO: Enrich the payload that's going to be cached'
-write(payload, "application/json")]]></ee:set-payload>
+						<ee:set-payload resource="dw/beers/serialize-beer-payload.dwl" />
 					</ee:message>
 				</ee:transform>
 				<os:store doc:name="Store write-through cache value for Beer" doc:id="ce8fefd2-2ace-4ec7-9e5b-e18e2502ac01" key="#[vars.key]" objectStore="response-cache" />
@@ -69,33 +62,7 @@ write(payload, "application/json")]]></ee:set-payload>
 		<!-- TODO: Add the negative scenario into the dataweave for if the beer doesnt exist in the DB return a 404 -->
 			<ee:transform doc:name="Transform into Domain Model" doc:id="9fd9af88-00de-49c4-a4c6-a64d47c17dae">
 			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-import java!com::mike::ResolveUri
-var beer = payload[1].payload.data
-var countries = vars.countries as Object
-output application/json
----
-//TODO: Add negative scenario here
-write(({
-	id: vars.uri.full,
-	identifier: beer.id,
-	name: beer.name,
-	abv: beer.abv,
-	breweries: beer.breweries map (brewery) -> {
-		// Resolve is in src/main/java and is a basic wrapper of the java URI object to allow relative path manipulation
-		id: ResolveUri::resolve(vars.uri.full, ("./../breweries/" ++ brewery.id)),
-		identifier: brewery.id,
-		name: brewery.name,
-		locations: (brewery.locations) map (location) -> using ( country = countries[location."countryIsoCode"]) {
-			name: location.name,
-			country: {
-				name: country.name,
-				flag: country.flag,
-				population: country.population
-			}
-		}
-	}
-}), "application/json")]]></ee:set-payload>
+							<ee:set-payload resource="dw/beers-trainsform-into-domain-beer-model.dwl" />
 			</ee:message>
 		</ee:transform>
 					<flow-ref doc:name="delete-all-flow-variables-sub-flow" doc:id="8f28b1d8-05d5-4730-8a8f-b60975fe0231" name="delete-all-flow-variables-sub-flow" />
@@ -109,6 +76,8 @@ write(({
 		</ee:transform>
 		<flow-ref doc:name="log-end-sub-flow" doc:id="73c02546-3446-4b9c-b2d9-f8faa3acc67d" name="log-end-sub-flow"/>
     </flow>
+    
+    <!-- TODO: Convert Limit/Offset to Page -->
     <flow name="get:\beers:main-config">
 		<set-variable value="#[vars.uri.full]" doc:name="Set key vars for cache as uri" doc:id="a5922023-7996-4257-9c85-ad05dc0db195" variableName="key"/>
 		<ee:cache doc:name="Cache Response based on URI" doc:id="6dd1a826-e87c-4491-8c6b-2426455b811d" cachingStrategy-ref="caching-strategy">
@@ -134,7 +103,7 @@ write(({
         </ee:transform>
 			<flow-ref doc:name="delete-all-flow-variables-sub-flow" doc:id="993de8fd-3baa-4c74-90b4-13d6ff8d7a3a" name="delete-all-flow-variables-sub-flow"/>
 		</ee:cache>
-		<ee:transform doc:name="Transform to JSON" doc:id="2bc8ab35-7ec3-4d4e-a634-f803e54736c5" >
+		<ee:transform doc:name="Transform to JSON response" doc:id="2bc8ab35-7ec3-4d4e-a634-f803e54736c5" >
 			<ee:message >
 				<ee:set-payload resource="dw/utils/convert-string-to-json-object.dwl" />
 			</ee:message>
@@ -142,6 +111,8 @@ write(({
 		<flow-ref doc:name="log-end-sub-flow" doc:id="8c2ce10c-cf61-42c8-a611-a328c29d5a58" name="log-end-sub-flow"/>
     </flow>
     <!-- TODO: Find a social media connector that can return reviews - Twitter doesnt work anymore -->
+    
+    <!-- Remove POST Beers as it doesnt show any implementation, only knowledge of REST -->
     <flow name="get:\beers\(beerId)\reviews:main-config">
         <ee:transform>
             <ee:variables>
@@ -168,9 +139,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-    
-    <!-- Remove POST Beers as it doesnt show any implementation, only knowledge of REST -->
-    <flow name="post:\beers:application\json:main-config">
+	<flow name="post:\beers:application\json:main-config">
         <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0

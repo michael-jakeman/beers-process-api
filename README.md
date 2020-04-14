@@ -40,6 +40,8 @@ To run MUnit tests they can either be run from Anypoint Studio or from the termi
 
 Simply right click and run from studio or run 'mvn test' in terminal.
 
+Running mvn test will run all JUnit and MUnit test cases.
+
 ## Shared RAML Components
 
 The API includes both a common library and common data types.
